@@ -48,7 +48,7 @@ router.post('/signup',async(req,res,next)=>{
         // return res.send(signData);
      
      if(signData){
-        let token = jwt.sign(signData.toJSON(),'SIGN_KEY');
+        let token = jwt.sign(signData.toJSON(),'LOG_KEY');
         let check = signData.toJSON();
         check.token=token;
         return res.status(200).json({statusCode:200,'message' : "registerd successfully", result : check})
