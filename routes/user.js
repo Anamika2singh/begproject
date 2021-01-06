@@ -45,6 +45,8 @@ router.post('/signup',async(req,res,next)=>{
             otp :  Math.floor(1000+Math.random()*9000)
      })
      console.log(signData);
+    return res.send(signData);
+     
      if(signData){
         let token = jwt.sign(signData.toJSON(),process.env.SECRET_SIGN_KEY);
         let check = signData.toJSON();
