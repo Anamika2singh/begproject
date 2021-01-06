@@ -15,7 +15,7 @@ const { Validator } = require('node-input-validator');
 var jwt = require('jsonwebtoken');
 const multer = require('multer');
 const { findOne } = require('../model/signupcus_model');
-router.post('/signup',(req,res,next)=>{
+router.post('/signup',async(req,res,next)=>{
    console.log(req.body)
    const   v = new Validator(req.body, {
        name : 'required',
@@ -23,42 +23,45 @@ router.post('/signup',(req,res,next)=>{
        phone_number : 'required|integer|maxLength:10',
        password:'required'        
        })
-     v.check().then((matched) => {
-               if (!matched) {
-                  res.status(422).send(v.errors);
-                }
-                else{
-                    signup.findOne({'email' : req.body.email},(err,result)=>{
-                        if(result == null){
-                            signup.create({
-                                name : req.body.name,
-                                email : req.body.email,
-                                phone_number : req.body.phone_number,
-                                password : bcrypt.hashSync(req.body.password , saltRounds),
-                                otp :  Math.floor(1000+Math.random()*9000)
-          }).then(user=>{
-              let token = jwt.sign(user.toJSON(),process.env.SECRET_SIGN_KEY)
-            console.log(token);
-            if(token){
-                let check = user.toJSON();
-                check.token=token;
-                res.status(200).json({statusCode:200,'message' : "registerd", result : check})
-            }
-            else{
-                res.status(400).json({statusCode:400,'message':"token not created"});
-            }
-            })
-.catch(err=>{res.status(500).json({statusCode:500,message:"internal server error",error : err.message})})          
-                        }
-                        else{
-                            res.status(400).json({statusCode:400,message : 'already registered mail'})
-                        }
-                    })   
-                   
-                }
-            })
-
+       const matched = await v.check();
+       let name_message=v.errors.name?v.errors.name.message:"";
+       let email_message = v.errors.email?v.errors.email.message+',':"";
+       let phone_number_message = v.errors.phone_number?v.errors.phone_number.message+',':"";
+       let password_message=v.errors.password?v.errors.password.message+',':"";
+       if(!matched){
+ res.status(422).json({statusCode : 422,message:name_message+email_message+phone_number_message+password_message})
+                  return;
+          }
+    else{
+        let result = await signup.findOne({'email' : req.body.email})
+        console.log(result);
+     if(result == null)
+     {
+         let signData = await  signup.create({
+            name : req.body.name,
+            email : req.body.email,
+            phone_number : req.body.phone_number,
+            password : bcrypt.hashSync(req.body.password , saltRounds),
+            otp :  Math.floor(1000+Math.random()*9000)
+     })
+     console.log(signData);
+     if(signData){
+        let token = jwt.sign(signData.toJSON(),process.env.SECRET_SIGN_KEY);
+        let check = signData.toJSON();
+        check.token=token;
+       res.status(200).json({statusCode:200,'message' : "registerd successfully", result : check})
+     }
+     else{
+    res.status(500).json({statusCode:500,message:"internal server error",error : err.message}) 
+     }
+    }
+    else{
+        console.log("email already register");
+        res.status(400).json({statusCode:400,message : 'already registered mail'})    
+    }
+}
 })
+
 router.post('/otpverify',(req,res,next)=>{
     const v =  new Validator(req.body , {
         phone_number : 'required|integer|maxLength:10',
