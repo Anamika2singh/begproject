@@ -11,4 +11,4 @@ var card = new Schema({
   status :{type : Number , default :1} 
 
 })
-module.exports =  mongoose.model('cards',card);
+module.exports =  mongoose.model('carts',card);

@@ -542,7 +542,7 @@ let found = 0;
     }
    }
     })
-router.post('/Card',(req,res,next)=>{
+router.post('/Cart',(req,res,next)=>{
     console.log(req.body);
     Cartmodel.create({
          customer_id:req.body.customer_id,
@@ -550,7 +550,7 @@ router.post('/Card',(req,res,next)=>{
          order:req.body.order,
          delivery:req.body.delivery,
          total_amount:req.body.total_amount
-    }).then(user=>{res.status(200).json({statusCode:200, message:"card created",user})})
+    }).then(user=>{res.status(200).json({statusCode:200, message:"cart created",user})})
     .catch(err=>{res.status(500).json({statusCode:500,message:"internal sever error",err:err})})
     // var item_arr =[];
     //     Cardmodel.create({
@@ -572,7 +572,7 @@ router.post('/Card',(req,res,next)=>{
         // })
         //     .catch(err=>{console.log(err)});
     })
-router.post('/getCard',(req,res,next)=>{
+router.post('/getCart',(req,res,next)=>{
     console.log(req.body);
 })
 module.exports = router;
