@@ -59,7 +59,7 @@ router.post('/signup',async(req,res,next)=>{
     }
     else{
         console.log("email already register");
-        res.status(400).json({statusCode:400,message : 'already registered mail'})    
+       return res.status(400).json({statusCode:400,message : 'already registered mail'})    
     }
 }
 })
