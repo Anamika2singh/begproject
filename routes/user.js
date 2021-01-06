@@ -48,7 +48,7 @@ router.post('/signup',(req,res,next)=>{
                 res.status(400).json({statusCode:400,'message':"token not created"});
             }
             })
-.catch(err=>{res.status(500).json({statusCode:500,message:"internal server error",error : err})})          
+.catch(err=>{res.status(500).json({statusCode:500,message:"internal server error",error : err.message})})          
                         }
                         else{
                             res.status(400).json({statusCode:400,message : 'already registered mail'})
