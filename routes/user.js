@@ -35,7 +35,7 @@ router.post('/signup',async(req,res,next)=>{
     else{
         let result = await signup.findOne({'email' : req.body.email})
         console.log(result);
-     if(result == null)
+     if(!result)
      {
          let signData = await  signup.create({
             name : req.body.name,
@@ -43,21 +43,20 @@ router.post('/signup',async(req,res,next)=>{
             phone_number : req.body.phone_number,
             password : bcrypt.hashSync(req.body.password , saltRounds),
             otp :  Math.floor(1000+Math.random()*9000)
-     })
-     console.log(signData);
-    // return res.send(signData);
+        })
+        console.log(signData);
+        // return res.send(signData);
      
-     if(signData){
-        let token = jwt.sign(signData.toJSON(),process.env.SECRET_SIGN_KEY);
-        let check = signData.toJSON();
-        check.token=token;
-      return res.status(200).json({statusCode:200,'message' : "registerd successfully", result : check})
-     }
-     else{
-    return res.status(500).json({statusCode:500,message:"internal server error",error : err.message}) 
-     }
-    }
-    else{
+        if(signData){
+            res.json('check')
+            let token = jwt.sign(signData.toJSON(),process.env.SECRET_SIGN_KEY);
+            let check = signData.toJSON();
+            check.token=token;
+            return res.status(200).json({statusCode:200,'message' : "registerd successfully", result : check})
+        }else{
+            return res.status(500).json({statusCode:500,message:"internal server error",error : err.message}) 
+        }
+    }else{
         console.log("email already register");
        return res.status(400).json({statusCode:400,message : 'already registered mail'})    
     }
