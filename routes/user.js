@@ -47,21 +47,16 @@ router.post('/signup',async(req,res,next)=>{
         console.log(signData);
         // return res.send(signData);
      
-        if(signData){
-            // res.json('check')
-            try{
-                let token = jwt.sign(signData.toJSON(),process.env.SECRET_SIGN_KEY);
-                let check = signData.toJSON();
-                check.token=token;
-            }catch(e){
-                res.json(e.message)
-            }
-            
-            return res.status(200).json({statusCode:200,'message' : "registerd successfully", result : check})
-        }else{
-            return res.status(500).json({statusCode:500,message:"internal server error",error : err.message}) 
-        }
-    }else{
+     if(signData){
+        let token = jwt.sign(signData.toJSON(),'SIGN_KEY');
+        let check = signData.toJSON();
+        check.token=token;
+        return res.status(200).json({statusCode:200,'message' : "registerd successfully", result : check})
+     }else{
+        return res.status(500).json({statusCode:500,message:"internal server error",error : err.message}) 
+     }
+    }
+    else{
         console.log("email already register");
        return res.status(400).json({statusCode:400,message : 'already registered mail'})    
     }
@@ -120,7 +115,7 @@ router.post('/login',(req,res,next)=>{
 
                 bcrypt.compare(req.body.password , result.password,(err,user)=>{
                     if(user == true){
-                      let token = jwt.sign(result.toJSON(),process.env.SECRET_LOG_KEY);
+                      let token = jwt.sign(result.toJSON(),'LOG_KEY');
                       console.log(token);
                       let check = result.toJSON();
                       check.token = token
