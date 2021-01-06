@@ -48,10 +48,15 @@ router.post('/signup',async(req,res,next)=>{
         // return res.send(signData);
      
         if(signData){
-            res.json('check')
-            let token = jwt.sign(signData.toJSON(),process.env.SECRET_SIGN_KEY);
-            let check = signData.toJSON();
-            check.token=token;
+            // res.json('check')
+            try{
+                let token = jwt.sign(signData.toJSON(),process.env.SECRET_SIGN_KEY);
+                let check = signData.toJSON();
+                check.token=token;
+            }catch(e){
+                res.json(e.message)
+            }
+            
             return res.status(200).json({statusCode:200,'message' : "registerd successfully", result : check})
         }else{
             return res.status(500).json({statusCode:500,message:"internal server error",error : err.message}) 
