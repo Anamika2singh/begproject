@@ -39,10 +39,16 @@ router.post('/signup',(req,res,next)=>{
           }).then(user=>{
               let token = jwt.sign(user.toJSON(),process.env.SECRET_SIGN_KEY)
             console.log(token);
-            let check = user.toJSON();
-            check.token=token;
-            res.status(200).json({statusCode:200,'message' : "registerd", result : check})})
-.catch(err=>{res.status(500).json({statusCode:500,message:"internal server error",error : err.message})})          
+            if(token){
+                let check = user.toJSON();
+                check.token=token;
+                res.status(200).json({statusCode:200,'message' : "registerd", result : check})
+            }
+            else{
+                res.status(400).json({statusCode:400,'message':"token not created"});
+            }
+            })
+.catch(err=>{res.status(500).json({statusCode:500,message:"internal server error",error : err})})          
                         }
                         else{
                             res.status(400).json({statusCode:400,message : 'already registered mail'})
