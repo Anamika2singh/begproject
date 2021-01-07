@@ -159,13 +159,11 @@ router.post('/forgetpass',(req,res,next)=>{
          })
  
 })
-router.post('/shipping_add',middle,(req,res,next)=>{
+router.post('/shipping_add',(req,res,next)=>{
     console.log(req.body);
-    console.log(req.userData);
-    console.log(req.userData._id);
+    
     const   v = new Validator(req.body, {
-        // customer_id :'required',
-        token : 'required',
+        customer_id :'required',
         address_line1 : 'required',
         address_line2 : 'required',
         city : 'required',
@@ -179,7 +177,7 @@ router.post('/shipping_add',middle,(req,res,next)=>{
                  }
                  else{
                     shipping.create({
-                        customer_id :req.userData._id,
+                        customer_id :req.body.customer_id,
                         address_line1 : req.body.address_line1,
                         address_line2 : req.body.address_line2,
                         city : req.body.city,
@@ -552,27 +550,20 @@ router.post('/Cart',(req,res,next)=>{
          total_amount:req.body.total_amount
     }).then(user=>{res.status(200).json({statusCode:200, message:"cart created",user})})
     .catch(err=>{res.status(500).json({statusCode:500,message:"internal sever error",err:err})})
-    // var item_arr =[];
-    //     Cardmodel.create({
-    //         user_id : req.body.user_id
-            // carditems: req.body.carditems
-        // }).then(result=>{  
-        //     console.log(result._id);
-        //    req.body.carditems.forEach(element=>{
-        //          const a = element.product_id;
-        //            const b = element.quantity;
-        //            item_arr.push({
-        //             card_id : result._id,
-        //             product_id: a,
-        //             quantity: b
-        //            })
-        //    })
-        // console.log(item_arr);
-        // Cardproductmodel.insertMany(item_arr);
-        // })
-        //     .catch(err=>{console.log(err)});
     })
-router.post('/getCart',(req,res,next)=>{
+router.post('/getCart',async(req,res,next)=>{
     console.log(req.body);
+    let arr_cart=[];
+  let result = await Cartmodel.findOne({'_id':req.body.cart_id},{created:0,updated:0,status:0});
+  console.log(result);
+//   res.send(result);
+  console.log(result.customer_id);
+  let address = await shipping.find({'customer_id':result.customer_id},{created:0,updated:0,status:0})
+   console.log(address);
+   arr_cart.push({
+       cart:result,
+       address});
+       res.send(arr_cart);
+       console.log(arr_cart);
 })
 module.exports = router;
