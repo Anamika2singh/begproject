@@ -14,7 +14,7 @@ const middle = require('../middleware/authentication');
 const { Validator } = require('node-input-validator');
 var jwt = require('jsonwebtoken');
 const multer = require('multer');
-const { findOne } = require('../model/signupcus_model');
+const { findOne, find } = require('../model/signupcus_model');
 router.post('/signup',async(req,res,next)=>{
    console.log(req.body)
    const   v = new Validator(req.body, {
@@ -159,11 +159,13 @@ router.post('/forgetpass',(req,res,next)=>{
          })
  
 })
-router.post('/shipping_add',(req,res,next)=>{
+router.post('/shipping_add',middle,(req,res,next)=>{
     console.log(req.body);
-    
+    console.log(req.userData);
+    console.log(req.userData._id);
     const   v = new Validator(req.body, {
-        customer_id :'required',
+        // customer_id :'required',
+        // token : 'required',
         address_line1 : 'required',
         address_line2 : 'required',
         city : 'required',
@@ -177,7 +179,7 @@ router.post('/shipping_add',(req,res,next)=>{
                  }
                  else{
                     shipping.create({
-                        customer_id :req.body.customer_id,
+                        customer_id :req.userData._id,
                         address_line1 : req.body.address_line1,
                         address_line2 : req.body.address_line2,
                         city : req.body.city,
@@ -190,37 +192,54 @@ router.post('/shipping_add',(req,res,next)=>{
                 })
 
 })
-router.post('/update_shipingadress',middle,(req,res,next)=>{
-    console.log(req.body)
-    const   v = new Validator(req.body, {
-        address_id : 'required',
-        token:'required',
-        address_line1 : 'required',
-        address_line2 : 'required',
-        city : 'required',
-        state : 'required',
-        zipcode : 'required',
-        country : 'required',
+router.post('/update_shipingadress',(req,res,next)=>{
+    console.log(req.body);
+//     var keys = ["address_line1", "address_line2", "city", "state", "zipcode","country"]; 
+//     var values = [req.body.address_line1,
+//         req.body.address_line2,
+//         req.body.city,
+//         req.body.state,req.body.zipcode,req.body.country];
+//     console.log(values);
+//     // Map created 
+//     var map = new Map(); 
+      
+//     // Using loop to insert key 
+//     // value in map 
+    // var a={}
+//     for(var i = 0; i < keys.length; i++){ 
+//         map.set(keys[i], values[i]); 
+//     } 
+    
+//     for (var key of map.keys()) { 
+//         console.log(key + " => " + map.get(key) );
+//         if(map.get(key))
+//         a[key]=map.get(key);
+//     }
+//     console.log(a)
+//    shipping.findByIdAndUpdate({'_id':req.body.address_id},{$set:a},(err,final)=>{
+
+//     if(final){
+//         console.log("updated");
+//     }
+
+//    })
+var arr={}
+let its=["address_line1", "address_line2", "city", "state", "zipcode","country"];
+for(const iterator of its){
+    if(req.body[iterator])
+    arr[iterator]=req.body[iterator]
+          }
+
+console.log(arr)
+shipping.findByIdAndUpdate({'_id':req.body.address_id},{$set:arr},(err,final)=>{
+
+        if(final){
+            console.log("updated");
+        }
+    
+       })
 
 
-        })
-      v.check().then((matched) => {
-                if (!matched) {
-                   res.status(422).send(v.errors);
-                 }
-                 else{
-                    shipping.findByIdAndUpdate({'_id' : req.body.address_id},{
-                        customer_id :req.userData._id,
-                        address_line1 : req.body.address_line1,
-                        address_line2 : req.body.address_line2,
-                        city : req.body.city,
-                        state : req.body.state,
-                        zipcode : req.body.zipcode,
-                        country : req.body.country
-                    }).then(user=>{res.status(200).json({statusCode:200,message: "updated"})})
-         .catch(err=>{res.status(500).json({statusCode:500,message:"internal server error",err : err.message})})
-                 }
-                })
 })
 
 router.post('/saved_addresses',async(req,res,next)=>{
